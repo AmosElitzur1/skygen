@@ -1,15 +1,15 @@
 import os
 
 
-def find_tfvars_files(directory) -> dict:
+def find_tfvars_files(directory) -> list:
     # List to store the file paths
-    tfvars_files = {}
+    tfvars_files = []
 
     # Walk through directory
     for dirpath, dirnames, filenames in os.walk(directory):
         for filename in filenames:
             if filename.endswith('.tfvars'):
-                tfvars_files[filename] = os.path.join(dirpath, filename)
+                tfvars_files.append(os.path.join(dirpath, filename))
     return tfvars_files
 
 def parseTfvars(tfVarsFile: str) -> dict:

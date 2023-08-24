@@ -30,7 +30,8 @@ if st.session_state.submit_button_clicked:
     destination_path = "cloned_repo"
     clone_repository(repo_url, destination_path)
     tfvars_files = find_tfvars_files(destination_path)
-    for tfvarfile in tfvars_files.keys():
-        parsedTfvars = parseTfvars(tfvars_files[tfvarfile])
-        for key in parsedTfvars.keys():
-            st.text_input(label=key, value=parsedTfvars[key])
+    tfvars_files_names = [file_path.replace(destination_path, "") for file_path in tfvars_files]
+    selected_tfvars_file = st.selectbox("Select tfvars file", tfvars_files_names)
+    parsedTfvars = parseTfvars(f"{destination_path}{selected_tfvars_file}")
+    for key in parsedTfvars.keys():
+        st.text_input(label=key, value=parsedTfvars[key])

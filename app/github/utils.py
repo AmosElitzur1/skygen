@@ -20,5 +20,5 @@ def parseTfvars(tfVarsFile: str) -> dict:
                 continue
             else:
                 key, value = line.split('=')
-                tfVars[key.strip()] = value.replace('"', '')
+                tfVars[key.strip()] = value.replace('"', '').strip()
     return tfVars

@@ -2,37 +2,37 @@ import streamlit as st
 from github.utils import parseTfvars, find_tfvars_files
 from github.get_repo_files import clone_repository
 
-# tab1, tab2, tab3 = st.tabs(["Cat", "Dog", "Owl"])
 
-# with tab1:
-#     st.header("A cat")
-#     st.image("https://static.streamlit.io/examples/cat.jpg", width=200)
+print("################ start ####################")
 
-# with tab2:
-#     st.header("A dog")
-#     st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
+def click_submit_button(git_url):
+    st.session_state.stage = "after_git_submit"
+    st.session_state.repo_url = git_url
 
-# with tab3:
-#     st.header("An owl")
-#     st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
-
-repo_url = st.text_input("Git URL")
-
-def click_submit_button():
-    st.session_state.submit_button_clicked = True
 
 def generate_all(selected_file, input_tfvars):
-    st.session_state.generate_all_clicked = True
-    print(selected_tfvars_file, input_tfvars)
+    print(selected_file, input_tfvars)
+    st.session_state.stage = "generate_pressed"
+
+destination_path = "cloned_repo"
 
 
-if 'submit_button_clicked' not in st.session_state:
-    st.session_state.submit_button_clicked = False
-st.button("Submit", on_click=click_submit_button)
-if st.session_state.submit_button_clicked:
+if 'stage' not in st.session_state:
+    st.session_state.stage = "before_insert_git"
+
+if st.session_state.stage == "before_insert_git":
+    repo_url = st.text_input("Git URL")
+    if "repo_url" not in st.session_state:
+        st.session_state.repo_url = repo_url
+    st.button("Submit", on_click=click_submit_button, args=[repo_url])
+
+if st.session_state.stage == "after_git_submit":
+    repo_url = st.session_state.repo_url
     print(repo_url)
-    destination_path = "cloned_repo"
     clone_repository(repo_url, destination_path)
+    st.session_state.stage = "after_clone"
+
+if st.session_state.stage == "after_clone":
     tfvars_files = find_tfvars_files(destination_path)
     tfvars_files_names = [file_path.replace(destination_path, "") for file_path in tfvars_files]
     selected_tfvars_file = st.selectbox("Select tfvars file", tfvars_files_names)
@@ -42,3 +42,6 @@ if st.session_state.submit_button_clicked:
     for key in parsedTfvars.keys():
         input_tfvars[key] = st.text_input(label=key, value=parsedTfvars[key])
     st.button("Generate the SKY🌇", on_click=generate_all, args=[selected_tfvars_file_full_path, input_tfvars])
+
+if st.session_state.stage == "generate_pressed":
+    st.write("this will be the workflow and the new tf vars")

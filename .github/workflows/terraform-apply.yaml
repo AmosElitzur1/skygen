@@ -1,0 +1,42 @@
+name: application-terraform-apply
+
+on:
+  push:
+
+jobs:
+
+  terraform-plan:
+    if: contains(github.event.head_commit.message, 'skygen')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: projects/
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform select workspace
+        id: select
+        env:
+          message: ${{ github.event.head_commit.message }}
+        run: |
+          workspace=$(echo $message | cut -d '-' -f 2)
+          terraform workspace select $workspace || terraform workspace new $workspace
+
+      - name: Terraform Apply
+        id: plan
+        env:
+          message: ${{ github.event.head_commit.message }}
+        run: |
+          workspace=$(echo $message | cut -d '-' -f 2)
+          terraform apply -no-color -lock=false --auto-approve -var-file="tfvars/$workspace.tfvars" 
+
+      

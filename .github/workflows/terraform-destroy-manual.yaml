@@ -1,0 +1,124 @@
+name: terraform-destroy-manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      workspace:
+        type: choice
+        description: 'Choose workspace to plan'
+        default: 'development'
+        required: true
+        options:
+          - development
+          - staging
+          - production
+
+jobs:
+  can-run:
+    concurrency:
+      group: terraform-plan-${{ github.event.inputs.workspace }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Can run"
+
+  terraform-destroy-integrations:
+    needs: can-run
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/integrations
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform select workspace ${{ inputs.workspace }}
+        id: select
+        run: terraform workspace select ${{ inputs.workspace }}
+
+      - name: Terraform Destroy
+        id: plan
+        run: terraform destroy -no-color -lock=false  --auto-approve -var-file="tfvars/${{ inputs.workspace }}.tfvars"
+    
+  terraform-destroy:
+    needs: [can-run, terraform-destroy-integrations]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        cwd: ["ecr", "dns", "database", "cloudfront", "sftp", "eks", "vpn"]
+    defaults:
+      run:
+        working-directory: projects/${{ matrix.cwd }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform select workspace ${{ inputs.workspace }}
+        id: select
+        run: terraform workspace select ${{ inputs.workspace }}
+
+      - name: Terraform Destroy
+        id: plan
+        run: terraform destroy -no-color -lock=false  --auto-approve -var-file="tfvars/${{ inputs.workspace }}.tfvars"
+
+ 
+
+  terraform-destroy-network:
+    needs: [can-run, terraform-destroy, terraform-destroy-integrations]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/networking
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform select workspace ${{ inputs.workspace }}
+        id: select
+        run: terraform workspace select ${{ inputs.workspace }}
+
+      - name: Terraform Destroy
+        id: plan
+        run: terraform destroy -no-color -lock=false  --auto-approve -var-file="tfvars/${{ inputs.workspace }}.tfvars"

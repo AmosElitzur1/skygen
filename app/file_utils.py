@@ -8,4 +8,4 @@ def generate_tfvars(full_path, input_tfvars, new_tfvars_file_name) -> str:
     str_lines = "\n".join(lines)
     with open(new_path, "w") as f:
         f.write(str_lines)
-    return str_lines
+    return str_lines, new_path

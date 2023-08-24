@@ -37,12 +37,12 @@ def build_file_tree(root_path):
     return file_tree
 
 
-def push_to_github(cloned_repo_path):
+def push_to_github(cloned_repo_path, new_tfvars_file_path):
     repo = Repo(cloned_repo_path)
     repo.git.add('--all')
     # Commit
-    staged_files = [item.a_path for item in repo.index.diff("HEAD")]
-    commit_message = f"The following files were updated: {', '.join(staged_files)}"
+    # staged_files = [item.a_path for item in repo.index.diff("HEAD")]
+    commit_message = f"skygen has pushed tfvars and workflow #tfvars_path={new_tfvars_file_path}"
     repo.index.commit(commit_message)
     # Assuming you have a remote named "origin"
     repo.remotes.origin.push()

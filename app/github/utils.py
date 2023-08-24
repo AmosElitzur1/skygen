@@ -1,10 +1,7 @@
-import streamlit as st
 import os
 
-st.text_input("Git URL")
 
-
-def find_tfvars_files(directory):
+def find_tfvars_files(directory) -> dict:
     # List to store the file paths
     tfvars_files = {}
 
@@ -25,15 +22,3 @@ def parseTfvars(tfVarsFile: str) -> dict:
                 key, value = line.split('=')
                 tfVars[key.strip()] = value.replace('"', '')
     return tfVars
-
-def click_submit_button():
-    st.session_state.submit_button_clicked = True
-
-
-if 'submit_button_clicked' not in st.session_state:
-    st.session_state.submit_button_clicked = False
-st.button("Submit", on_click=click_submit_button)
-if st.session_state.submit_button_clicked:
-    parsedTfvars = parseTfvars("demo.tfvars")
-    for key in parsedTfvars.keys():
-        st.text_input(label=key, value=parsedTfvars[key])

@@ -1,5 +1,5 @@
 import streamlit as st
-from github.utils import parseTfvars
+from github.utils import parseTfvars, find_tfvars_files
 from github.get_repo_files import clone_repository
 
 # tab1, tab2, tab3 = st.tabs(["Cat", "Dog", "Owl"])
@@ -27,7 +27,10 @@ if 'submit_button_clicked' not in st.session_state:
 st.button("Submit", on_click=click_submit_button)
 if st.session_state.submit_button_clicked:
     print(repo_url)
-    clone_repository(repo_url, "cloned_repo")
-    # parsedTfvars = parseTfvars("demo.tfvars")
-    # for key in parsedTfvars.keys():
-    #     st.text_input(label=key, value=parsedTfvars[key])
+    destination_path = "cloned_repo"
+    clone_repository(repo_url, destination_path)
+    tfvars_files = find_tfvars_files(destination_path)
+    for tfvarfile in tfvars_files.keys():
+        parsedTfvars = parseTfvars(tfvars_files[tfvarfile])
+        for key in parsedTfvars.keys():
+            st.text_input(label=key, value=parsedTfvars[key])

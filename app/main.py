@@ -27,6 +27,8 @@ with st.sidebar:
         "Choose a shipping method",
         ("Standard (5-15 days)", "Express (2-5 days)")
     )
+if 'repo_url' in st.session_state:
+    st.write(f"repo url: {st.session_state.repo_url}")
 
 if 'stage' not in st.session_state:
     st.session_state.stage = "before_insert_git"

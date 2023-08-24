@@ -31,4 +31,3 @@ jobs:
         run: |
           terraform apply -no-color -lock=false --auto-approve -var-file="${{ inputs.tfvars_path }}" 
 
-      

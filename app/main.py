@@ -1,6 +1,8 @@
 import streamlit as st
 from github.utils import parseTfvars, find_tfvars_files
 from github.get_repo_files import clone_repository
+from github.create_workflow import create_workflow
+from file_utils import generate_tfvars
 
 
 print("################ start ####################")
@@ -12,6 +14,8 @@ def click_submit_button(git_url):
 
 def generate_all(selected_file, input_tfvars):
     print(selected_file, input_tfvars)
+    create_workflow(selected_file)
+    generate_tfvars(input_tfvars)
     st.session_state.stage = "generate_pressed"
 
 destination_path = "cloned_repo"

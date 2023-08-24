@@ -37,6 +37,18 @@ def build_file_tree(root_path):
     return file_tree
 
 
+def push_to_github(cloned_repo_path):
+    repo = Repo(cloned_repo_path)
+    repo.git.add('--all')
+    # Commit
+    staged_files = [item.a_path for item in repo.index.diff(None)]
+    commit_message = f"The following files were updated: {', '.join(staged_files)}"
+    repo.index.commit(commit_message)
+    # Assuming you have a remote named "origin"
+    repo.remotes.origin.push()
+
+    
+
 if __name__ == '__main__':
     repo_url = "https://github.com/AmosElitzur1/skygen.git"
     destination_path = "cloned_repo"

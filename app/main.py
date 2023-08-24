@@ -21,6 +21,10 @@ repo_url = st.text_input("Git URL")
 def click_submit_button():
     st.session_state.submit_button_clicked = True
 
+def generate_all(selected_file, input_tfvars):
+    st.session_state.generate_all_clicked = True
+    print(selected_tfvars_file, input_tfvars)
+
 
 if 'submit_button_clicked' not in st.session_state:
     st.session_state.submit_button_clicked = False
@@ -32,6 +36,9 @@ if st.session_state.submit_button_clicked:
     tfvars_files = find_tfvars_files(destination_path)
     tfvars_files_names = [file_path.replace(destination_path, "") for file_path in tfvars_files]
     selected_tfvars_file = st.selectbox("Select tfvars file", tfvars_files_names)
-    parsedTfvars = parseTfvars(f"{destination_path}{selected_tfvars_file}")
+    selected_tfvars_file_full_path = f"{destination_path}{selected_tfvars_file}"
+    parsedTfvars = parseTfvars(selected_tfvars_file_full_path)
+    input_tfvars = {}
     for key in parsedTfvars.keys():
-        st.text_input(label=key, value=parsedTfvars[key])
+        input_tfvars[key] = st.text_input(label=key, value=parsedTfvars[key])
+    st.button("Generate the SKY🌇", on_click=generate_all, args=[selected_tfvars_file_full_path, input_tfvars])

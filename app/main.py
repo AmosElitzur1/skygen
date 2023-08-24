@@ -2,17 +2,24 @@ import streamlit as st
 from github.utils import parseTfvars, find_tfvars_files
 from github.get_repo_files import clone_repository
 from github.create_workflow import create_workflow
+from github.get_repos import search_public_repositories
 from file_utils import generate_tfvars
 
 
 print("################ start ####################")
 destination_path = "cloned_repo"
 
+def click_submit_button(git_owner):
+    st.session_state.stage = "after_git_owner_submit"
+    st.session_state.git_owner = git_owner
+    git_repos = search_public_repositories(git_owner)
+    st.session_state.repo_url=""
+    st.session_state.repo_url = st.selectbox("Select repo", git_repos, on_change=choose_repo(st.session_state.repo_url))
 
-def click_submit_button(git_url):
-    st.session_state.stage = "after_git_submit"
-    st.session_state.repo_url = git_url
-
+def choose_repo(git_url):
+    if(st.session_state.repo_url!="") :
+        st.session_state.stage = "after_git_submit"
+        st.session_state.repo_url = git_url
 
 def generate_all(selected_file, input_tfvars):
     print(selected_file, input_tfvars)
@@ -25,10 +32,10 @@ if 'stage' not in st.session_state:
     st.session_state.stage = "before_insert_git"
 
 if st.session_state.stage == "before_insert_git":
-    repo_url = st.text_input("Git URL")
-    if "repo_url" not in st.session_state:
-        st.session_state.repo_url = repo_url
-    st.button("Submit", on_click=click_submit_button, args=[repo_url])
+    git_owner = st.text_input("Git Owner")
+    if "git_owner" not in st.session_state:
+        st.session_state.git_owner = git_owner
+    st.button("Submit", on_click=click_submit_button, args=[git_owner])
 
 if st.session_state.stage == "after_git_submit":
     repo_url = st.session_state.repo_url

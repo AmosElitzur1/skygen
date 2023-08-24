@@ -1,39 +1,44 @@
-import requests
-import base64
 import os
+from git import Repo
 import sys
 
 
-token = os.getenv("GLOBAL_CICD_GIT_TOKEN")
-headers = {
-    # "Authorization": f"Bearer {token}",
-    "Accept": "application/vnd.github.v3+json"
-}
-
-def parse_dir():
-    pass
+def clean_path(destination_path):
+    os.rmdir(destination_path)
+    os.listdir(".")
 
 
-def create_tree(json_res, path):
-    for file in json_res:
-        if file['type'] == 'file':
-            tree[path] = file['name']
-        elif file['type'] == 'dir':
-            create_tree()
+def clone_repository(repo_url, destination_path):
+    try:
+        clean_path(destination_path)
+        Repo.clone_from(repo_url, destination_path)
+        print(f"Repository cloned to {destination_path}")
+    except Exception as e:
+        print("Error:", e)
 
-def get_file_from_github(repo: str) -> None:
-    api_url = f"https://api.github.com/repos/{repo}/contents"
-    response = requests.get(api_url, headers=headers)
-    if response.status_code == 200:
-        print(response.json())
-        tree = create_tree(response.json())
+repo_url = "https://github.com/AmosElitzur1/skygen.git"
+destination_path = "cloned_repo"
 
-    else:
-        print("Error fetching the files:", response.status_code, response.text)
+clone_repository(repo_url, destination_path)
 
 
-if __name__ == '__main__':
-    tree = {}
-    REPO = "AmosElitzur1/skygen"
-    path = ""
-    get_file_from_github(REPO)
+def build_file_tree(root_path):
+    file_tree = {}
+    for root, dirs, files in os.walk(root_path):
+        # Skip directories that start with "."
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        current_dir = file_tree
+        root_parts = os.path.relpath(root, root_path).split(os.path.sep)
+
+        for part in root_parts:
+            current_dir = current_dir.setdefault(part, {})
+
+        for file in files:
+            # Skip files that start with "."
+            if not file.startswith('.'):
+                current_dir[file] = None
+
+    return file_tree
+
+file_tree = build_file_tree("cloned_repo")
+print(file_tree)

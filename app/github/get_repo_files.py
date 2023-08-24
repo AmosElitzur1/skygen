@@ -41,7 +41,7 @@ def push_to_github(cloned_repo_path):
     repo = Repo(cloned_repo_path)
     repo.git.add('--all')
     # Commit
-    staged_files = [item.a_path for item in repo.index.diff(None)]
+    staged_files = [item.a_path for item in repo.index.diff("HEAD")]
     commit_message = f"The following files were updated: {', '.join(staged_files)}"
     repo.index.commit(commit_message)
     # Assuming you have a remote named "origin"

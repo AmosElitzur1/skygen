@@ -14,12 +14,19 @@ def click_submit_button(git_url):
 
 def generate_all(selected_file, input_tfvars):
     print(selected_file, input_tfvars)
-    create_workflow(selected_file)
-    generate_tfvars(input_tfvars)
+    # create_workflow(selected_file)
+    new_tfvars = generate_tfvars(input_tfvars)
+    st.header("New tfvars")
+    st.code(new_tfvars, language="hcl", line_numbers=True)
     st.session_state.stage = "generate_pressed"
 
 destination_path = "cloned_repo"
 
+with st.sidebar:
+    add_radio = st.radio(
+        "Choose a shipping method",
+        ("Standard (5-15 days)", "Express (2-5 days)")
+    )
 
 if 'stage' not in st.session_state:
     st.session_state.stage = "before_insert_git"

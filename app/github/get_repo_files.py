@@ -11,11 +11,15 @@ headers = {
 }
 
 def parse_dir():
-
-
-def create_tree(json_res):
     pass
 
+
+def create_tree(json_res, path):
+    for file in json_res:
+        if file['type'] == 'file':
+            tree[path] = file['name']
+        elif file['type'] == 'dir':
+            create_tree()
 
 def get_file_from_github(repo: str) -> None:
     api_url = f"https://api.github.com/repos/{repo}/contents"

@@ -1,6 +1,6 @@
 resource "null_resource" "test" {
   provisioner "local-exec" {
-    command = "echo 'hello form ${var.name}'" 
+    command = "echo 'hello from ${var.name}'" 
   }
 }
 

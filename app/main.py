@@ -5,6 +5,8 @@ from github.create_workflow import create_workflow
 from file_utils import generate_tfvars
 
 print("################ start ####################")
+destination_path = "cloned_repo"
+
 
 def click_submit_button(git_url):
     st.session_state.stage = "after_git_submit"
@@ -13,22 +15,13 @@ def click_submit_button(git_url):
 
 def generate_all(selected_file, input_tfvars, new_tfvars_file_name):
     print(selected_file, input_tfvars)
-    # create_workflow(selected_file)
     new_tfvars = generate_tfvars(selected_file, input_tfvars, new_tfvars_file_name)
+    create_workflow("workflow_template.yaml", destination_path)
     st.header("New tfvars")
     push_to_github(destination_path)
     st.code(new_tfvars, language="hcl", line_numbers=True)
     st.session_state.stage = "generate_pressed"
 
-destination_path = "cloned_repo"
-
-with st.sidebar:
-    add_radio = st.radio(
-        "Choose a shipping method",
-        ("Standard (5-15 days)", "Express (2-5 days)")
-    )
-if 'repo_url' in st.session_state:
-    st.write(f"repo url: {st.session_state.repo_url}")
 
 if 'stage' not in st.session_state:
     st.session_state.stage = "before_insert_git"

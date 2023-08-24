@@ -13,9 +13,10 @@ def click_submit_button(git_owner):
     st.session_state.git_owner = git_owner
     st.session_state.git_repos = search_public_repositories(git_owner)
 
-def choose_repo(git_url):
-    print(git_url)
-    if git_url != "":
+def choose_repo(repo_name):
+    if repo_name != "" and repo_name != "Choose repository":
+        git_url = "https://github.com/"+st.session_state.git_owner+"/"+repo_name+".git"
+        print(git_url)
         st.session_state.stage = "after_git_submit"
         st.session_state.repo_url = git_url
 
@@ -35,14 +36,14 @@ if 'stage' not in st.session_state:
 if st.session_state.stage == "before_insert_git":
     st.session_state.git_repos = []
 
-git_owner = st.text_input("Git Owner")
+git_owner = st.sidebar.text_input("Git Owner")
 if "git_owner" not in st.session_state:
     st.session_state.git_owner = git_owner
-st.button("Submit Owner", on_click=click_submit_button, args=[git_owner])
+st.sidebar.button("Submit Owner", on_click=click_submit_button, args=[git_owner])
 
 # if st.session_state.stage == "after_git_owner_submit":
-repo_url = st.selectbox("Select repo", st.session_state.git_repos)
-st.button("Submit Repo", on_click=choose_repo, args=[repo_url])
+repo_name = st.sidebar.selectbox("Select repo", st.session_state.git_repos)
+st.sidebar.button("Submit Repo", on_click=choose_repo, args=[repo_name])
 
 if st.session_state.stage == "after_git_submit":
     repo_url = st.session_state.repo_url

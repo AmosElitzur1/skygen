@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
  
 st.write("""
-# My first app
-Hello *world!*
+# SKYGEN TEAM!!!!
+We Are The *Champions!*
 """)
  
 df = pd.read_csv("my_data.csv")

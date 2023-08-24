@@ -1,35 +1,49 @@
-import requests
-import base64
 import os
+from git import Repo
 import sys
+import shutil
 
 
-token = os.getenv("GLOBAL_CICD_GIT_TOKEN")
-headers = {
-    # "Authorization": f"Bearer {token}",
-    "Accept": "application/vnd.github.v3+json"
-}
-
-def parse_dir():
-
-
-def create_tree(json_res):
-    pass
+def clean_path(directory_path):
+    try:
+        shutil.rmtree(directory_path)
+        print(f"Directory '{directory_path}' removed successfully.")
+    except Exception as e:
+        print(f"Error removing directory '{directory_path}': {e}")
 
 
-def get_file_from_github(repo: str) -> None:
-    api_url = f"https://api.github.com/repos/{repo}/contents"
-    response = requests.get(api_url, headers=headers)
-    if response.status_code == 200:
-        print(response.json())
-        tree = create_tree(response.json())
+def clone_repository(repo_url, destination_path):
+    try:
+        clean_path(destination_path)
+        Repo.clone_from(repo_url, destination_path)
+        print(f"Repository cloned to {destination_path}")
+    except Exception as e:
+        print("Error:", e)
 
-    else:
-        print("Error fetching the files:", response.status_code, response.text)
+
+def build_file_tree(root_path):
+    file_tree = {}
+    for root, dirs, files in os.walk(root_path):
+        # Skip directories that start with "."
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        current_dir = file_tree
+        root_parts = os.path.relpath(root, root_path).split(os.path.sep)
+        for part in root_parts:
+            current_dir = current_dir.setdefault(part, {})
+        for file in files:
+            if not file.startswith('.'):
+                current_dir[file] = None
+
+    return file_tree
 
 
 if __name__ == '__main__':
-    tree = {}
-    REPO = "AmosElitzur1/skygen"
-    path = ""
-    get_file_from_github(REPO)
+    repo_url = "https://github.com/AmosElitzur1/skygen.git"
+    destination_path = "cloned_repo"
+    if len(sys.argv) >= 2:
+        repo_url = sys.argv[1]
+    if len(sys.argv) == 3:
+        destination_path = sys.argv[2]
+    clone_repository(repo_url, destination_path)
+    file_tree = build_file_tree(destination_path)
+    print(file_tree)

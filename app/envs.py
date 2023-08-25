@@ -19,7 +19,7 @@ def open_edit_page(selected_tfvars_file):
         input_tfvars[key] = st.text_input(label=key, value=parsedTfvars[key])
     st.button("Re-Generate the SKY🌇", on_click=generate_all, args=[selected_tfvars_file_full_path, input_tfvars, selected_tfvars_file_full_path])
 
-def get_envs(envs_list, dest_path, repo_url):
+def get_envs(envs_list, dest_path):
     num_items = len(envs_list)
     num_columns = 3
     num_rows = -(-num_items // num_columns)  # Ceiling division to calculate the number of rows
@@ -45,8 +45,8 @@ def get_envs(envs_list, dest_path, repo_url):
             button_col1, button_col2, button_col3, button_col4 = col.columns(4)
             button_col1.button("✅", "apply_"+item, on_click=terraform_command_send, args=["apply", dest_path, item])
             button_col2.button("️🛑", "destroy_"+item, on_click=terraform_command_send, args=["destroy", dest_path, item])
-            button_col3.button("🖋️", "edit_"+item, on_click=open_edit_page, args=[item])
-            button_col4.button("🗑️", "delete_"+item)
+            button_col3.button("🖋️", "edit_"+item)
+            button_col4.button("🗑️", "delete_"+item, on_click=terraform_command_send, args=["remove", dest_path, item])
 
             with col:
                 col.markdown("---")

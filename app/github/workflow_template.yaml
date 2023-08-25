@@ -47,5 +47,13 @@ jobs:
           if [ -z $tf_command ] ; then
             tf_command="apply"
           fi
+          if [ "$tf_command" = "remove" ] ; then
+            to_remove="true"
+            tf_command="destroy"
+          fi
           terraform $tf_command -no-color -lock=false --auto-approve -var-file="${{ env.tfvars_path }}" 
-
+          if [ "$to_remove" = 'true' ] ; then
+            rm -f $tfvars_path
+            git commit -am "remove $tfvars_path by skygen"
+            git push
+          fi

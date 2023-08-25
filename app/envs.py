@@ -45,7 +45,7 @@ def get_envs(envs_list, dest_path):
             button_col1, button_col2, button_col3, button_col4 = col.columns(4)
             button_col1.button("✅", "apply_"+item, on_click=terraform_command_send, args=["apply", dest_path, item])
             button_col2.button("️🛑", "destroy_"+item, on_click=terraform_command_send, args=["destroy", dest_path, item])
-            button_col3.button("🖋️", "edit_"+item)
+            button_col3.button("🖋️", "edit_"+item, on_click=open_edit_page, args=[item])
             button_col4.button("🗑️", "delete_"+item, on_click=terraform_command_send, args=["remove", dest_path, item])
 
             with col:

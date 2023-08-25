@@ -93,11 +93,16 @@ def page_ai_gen():
     content = response["choices"][0]["message"]["content"]
     print(content)
 
-    save = re.search(r'code:\s*\n\n([\s\S]*)', content).group(1)
-    print(save)
+    save = ""
+    try:
+        save = re.search(r'code:\s*([\s\S]*)', content).group(1)
+        if save:
+            content = save
+    except:
+        pass
 
     code = f'''
-    {save}
+    {content}
     '''
     st.code(code, language='python')
 

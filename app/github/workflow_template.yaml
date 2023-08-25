@@ -23,6 +23,11 @@ jobs:
           file_path=$(echo "${{github.event.head_commit.message}}" | awk -F "#tfvars_path=" '{print $2}' | awk '{print $1}')
           echo "tfvars_path=$file_path" >> $GITHUB_ENV
         if: contains(github.event.head_commit.message, '#tfvars_path=')
+      - name: handle push commit2
+        run: |
+          tf_command=$(echo "${{github.event.head_commit.message}}" | awk -F "#tf_command=" '{print $2}' | awk '{print $1}')
+          echo "tf_command=$tf_command=" >> $GITHUB_ENV
+        if: contains(github.event.head_commit.message, '#tf_command=')
       - uses: hashicorp/setup-terraform@v1
         with:
           terraform_wrapper: false
@@ -36,8 +41,11 @@ jobs:
           workspace=$(basename ${{ env.tfvars_path }} | cut -d "." -f 1)
           terraform workspace select $workspace || terraform workspace new $workspace
 
-      - name: Terraform Apply
+      - name: Terraform Apply destroy
         id: apply
         run: |
-          terraform apply -no-color -lock=false --auto-approve -var-file="${{ env.tfvars_path }}" 
+          if [ -z $tf_command ] ; then
+            tf_command="apply"
+          fi
+          terraform $tf_command -no-color -lock=false --auto-approve -var-file="${{ env.tfvars_path }}" 
 

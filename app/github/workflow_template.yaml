@@ -26,7 +26,7 @@ jobs:
       - name: handle push commit2
         run: |
           tf_command=$(echo "${{github.event.head_commit.message}}" | awk -F "#tf_command=" '{print $2}' | awk '{print $1}')
-          echo "tf_command=$tf_command=" >> $GITHUB_ENV
+          echo "tf_command=$tf_command" >> $GITHUB_ENV
         if: contains(github.event.head_commit.message, '#tf_command=')
       - uses: hashicorp/setup-terraform@v1
         with:

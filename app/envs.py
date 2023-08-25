@@ -1,7 +1,13 @@
 import streamlit as st
 import numpy as np
+from github.get_repo_files import *
 
-def get_envs(envs_list):
+
+def terraform_command_send(tf_command, cloned_repo_path, tfvars_path):
+    push_apply_to_github(cloned_repo_path, tfvars_path, tf_command)
+
+
+def get_envs(envs_list, dest_path, repo_url):
     num_items = len(envs_list)
     num_columns = 3
     num_rows = -(-num_items // num_columns)  # Ceiling division to calculate the number of rows
@@ -24,13 +30,15 @@ def get_envs(envs_list):
                 col.caption(item)
 
             # Add buttons
-            button_col1, button_col2, button_col3 = col.columns(3)
-            if button_col1.button("✅", "apply_"+item):
+            button_col1, button_col2, button_col3, button_col4 = col.columns(4)
+            if button_col1.button("✅", "apply_"+item, on_click=terraform_command_send, args=["apply", dest_path, item]):
                 st.write(f"Button 1 clicked for {item}")
-            if button_col2.button("🖋️", "edit_"+item):
+            if button_col2.button("️🛑", "destroy_"+item, on_click=terraform_command_send, args=["destroy", dest_path, item]):
                 st.write(f"Button 2 clicked for {item}")
-            if button_col3.button("🗑️", "destroy_"+item):
+            if button_col3.button("🖋️", "edit_"+item, on_click=terraform_command_send, args=[]):
                 st.write(f"Button 3 clicked for {item}")
+            if button_col4.button("🗑️", "delete_"+item, on_click=terraform_command_send, args=[]):
+                st.write(f"Button 4 clicked for {item}")
 
             with col:
                 col.markdown("---")

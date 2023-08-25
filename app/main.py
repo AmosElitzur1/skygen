@@ -80,7 +80,7 @@ def page_manage():
     if st.session_state.stage == "after_clone":
         tfvars_files = find_tfvars_files(destination_path)
         tfvars_files_names = [file_path.replace(destination_path, "") for file_path in tfvars_files]
-        get_envs(tfvars_files_names)
+        get_envs(tfvars_files_names, destination_path, st.session_state.repo_url)
 
 def page_ai_gen():
     tree = build_file_tree(destination_path)

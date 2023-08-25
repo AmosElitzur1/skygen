@@ -47,6 +47,17 @@ def push_to_github(cloned_repo_path, new_tfvars_file_path):
     # Assuming you have a remote named "origin"
     repo.remotes.origin.push()
 
+
+def push_apply_to_github(cloned_repo_path, new_tfvars_file_path, tf_command):
+    repo = Repo(cloned_repo_path)
+    repo.git.add('--all')
+    # Commit
+    # staged_files = [item.a_path for item in repo.index.diff("HEAD")]
+    commit_message = f"skygen has pushed apply command #{tf_command} #tfvars_path={new_tfvars_file_path}"
+    repo.index.commit(commit_message)
+    # Assuming you have a remote named "origin"
+    repo.remotes.origin.push()
+
     
 
 if __name__ == '__main__':

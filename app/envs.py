@@ -30,7 +30,7 @@ def get_envs(envs_list):
             if button_col2.button("🖋️", "edit_"+item):
                 st.write(f"Button 2 clicked for {item}")
             if button_col3.button("🗑️", "destroy_"+item):
-                st.write(f"Button 2 clicked for {item}")
+                st.write(f"Button 3 clicked for {item}")
 
             with col:
                 col.markdown("---")

@@ -9,7 +9,7 @@ def terraform_command_send(tf_command, cloned_repo_path, tfvars_path):
     push_apply_to_github(cloned_repo_path, tfvars_path, tf_command)
 
 
-def get_envs(envs_list, dest_path, repo_url):
+def get_envs(envs_list, dest_path):
     num_items = len(envs_list)
     num_columns = 3
     num_rows = -(-num_items // num_columns)  # Ceiling division to calculate the number of rows
@@ -36,7 +36,7 @@ def get_envs(envs_list, dest_path, repo_url):
             button_col1.button("✅", "apply_"+item, on_click=terraform_command_send, args=["apply", dest_path, item])
             button_col2.button("️🛑", "destroy_"+item, on_click=terraform_command_send, args=["destroy", dest_path, item])
             button_col3.button("🖋️", "edit_"+item)
-            button_col4.button("🗑️", "delete_"+item)
+            button_col4.button("🗑️", "delete_"+item, on_click=terraform_command_send, args=["remove", dest_path, item])
 
             with col:
                 col.markdown("---")

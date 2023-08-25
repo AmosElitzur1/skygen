@@ -9,6 +9,9 @@ on:
         required: true
         description: ""
 
+permissions:
+  contents: write
+
 env:
   tfvars_path: ${{ inputs.tfvars_path }}
 

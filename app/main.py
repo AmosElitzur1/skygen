@@ -10,7 +10,13 @@ from prompts import generate_automation_prompt
 from urllib3.exceptions import InsecureRequestWarning
 from urllib3 import disable_warnings
 import re
+from dotenv import load_dotenv
+import os
+import openai
 disable_warnings(InsecureRequestWarning) ## not needed, added by Adir
+
+load_dotenv()
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 print("################ start ####################")
 destination_path = "cloned_repo"
@@ -73,23 +79,25 @@ def page_manage():
         get_envs(tfvars_files_names, destination_path)
 
 def page_ai_gen():
+    st.title("Workflow AI Generator🤖")
     tree = build_file_tree(destination_path)
 
-    API_URL = "https://flowise-9ihn.onrender.com/api/v1/prediction/5e73c1f1-82a2-4c13-9d88-36d8878b34ca"
-    payload = {
-        "question": f"{generate_automation_prompt} {tree}",
-    }  
-    output = requests.post(API_URL, json=payload, verify=False).json()
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": f"{generate_automation_prompt} {tree}"},
+        ],
+        temperature=0.0,
+    )
 
-    yaml_match = re.search(r'```yaml\n(.*?)```', output, re.DOTALL)
-    if yaml_match:
-        yaml_content = yaml_match.group(1)
-        print(yaml_content)
-    else:
-        print("No YAML code block found.")
+    content = response["choices"][0]["message"]["content"]
+    print(content)
+
+    save = re.search(r'code:\s*\n\n([\s\S]*)', content).group(1)
+    print(save)
 
     code = f'''
-    {yaml_content}
+    {save}
     '''
     st.code(code, language='python')
 

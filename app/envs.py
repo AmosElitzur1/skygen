@@ -20,6 +20,7 @@ def open_edit_page(selected_tfvars_file):
     st.button("Re-Generate the SKY🌇", on_click=generate_all, args=[selected_tfvars_file_full_path, input_tfvars, selected_tfvars_file_full_path])
 
 def get_envs(envs_list, dest_path):
+    print("##### env list ######")
     num_items = len(envs_list)
     num_columns = 3
     num_rows = -(-num_items // num_columns)  # Ceiling division to calculate the number of rows

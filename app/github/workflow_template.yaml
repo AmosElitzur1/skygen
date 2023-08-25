@@ -57,6 +57,8 @@ jobs:
           terraform $tf_command -no-color -lock=false --auto-approve -var-file="${{ env.tfvars_path }}" 
           if [ "$to_remove" = 'true' ] ; then
             rm -f $tfvars_path
+            git config --global user.email "aran@skygen.com"
+            git config --global user.name "skygenuser"
             git commit -am "remove $tfvars_path by skygen"
             git push
           fi

@@ -1,10 +1,9 @@
 import streamlit as st
 from github.utils import parseTfvars, find_tfvars_files
-from github.get_repo_files import clone_repository, push_to_github
-from github.create_workflow import create_workflow
+from github.get_repo_files import clone_repository
 from github.get_repos import search_public_repositories
-from file_utils import generate_tfvars
 from envs import get_envs
+from generate import generate_all
 import requests
 from github.get_repo_files import clone_repository, build_file_tree
 from prompts import generate_automation_prompt
@@ -30,15 +29,6 @@ def choose_repo(repo_name):
         print(git_url)
         st.session_state.stage = "after_git_submit"
         st.session_state.repo_url = git_url
-
-def generate_all(selected_file, input_tfvars, new_tfvars_file_name):
-    print(selected_file, input_tfvars)
-    new_tfvars, full_file_path = generate_tfvars(selected_file, input_tfvars, new_tfvars_file_name)
-    create_workflow("workflow_template.yaml", destination_path)
-    st.header("New tfvars")
-    push_to_github(destination_path, full_file_path.replace(f"{destination_path}/", ""))
-    st.code(new_tfvars, language="hcl", line_numbers=True)
-    st.session_state.stage = "generate_pressed"
 
 if st.session_state.stage == "before_insert_git":
     st.session_state.git_repos = []

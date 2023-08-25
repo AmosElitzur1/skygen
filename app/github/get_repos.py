@@ -6,8 +6,9 @@ def search_public_repositories(owner):
     
     if response.status_code == 200:
         repositories = response.json()
-        clone_urls = [repository["clone_url"] for repository in repositories]
-        clone_urls.insert(0, "")
+        clone_urls = [repository["name"] for repository in repositories]
+        if len(clone_urls) > 0:
+            clone_urls.insert(0, "Choose repository")
         return clone_urls
     else:
         print(f"Failed to retrieve repositories. Error: {response.status_code}")

@@ -5,7 +5,7 @@ from github.create_workflow import create_workflow
 
 
 def terraform_command_send(tf_command, cloned_repo_path, tfvars_path):
-    create_workflow("workflow_template.yaml", destination_path)
+    create_workflow("workflow_template.yaml", cloned_repo_path)
     push_apply_to_github(cloned_repo_path, tfvars_path, tf_command)
 
 

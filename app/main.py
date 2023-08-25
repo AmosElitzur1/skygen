@@ -5,6 +5,13 @@ from github.create_workflow import create_workflow
 from github.get_repos import search_public_repositories
 from file_utils import generate_tfvars
 from envs import get_envs
+import requests
+from github.get_repo_files import clone_repository, build_file_tree
+from prompts import generate_automation_prompt
+from urllib3.exceptions import InsecureRequestWarning
+from urllib3 import disable_warnings
+import re
+disable_warnings(InsecureRequestWarning) ## not needed, added by Adir
 
 print("################ start ####################")
 destination_path = "cloned_repo"
@@ -75,15 +82,38 @@ def page_manage():
         tfvars_files_names = [file_path.replace(destination_path, "") for file_path in tfvars_files]
         get_envs(tfvars_files_names)
 
+def page_ai_gen():
+    tree = build_file_tree(destination_path)
+
+    API_URL = "https://flowise-9ihn.onrender.com/api/v1/prediction/5e73c1f1-82a2-4c13-9d88-36d8878b34ca"
+    payload = {
+        "question": f"{generate_automation_prompt} {tree}",
+    }  
+    output = requests.post(API_URL, json=payload, verify=False).json()
+
+    yaml_match = re.search(r'```yaml\n(.*?)```', output, re.DOTALL)
+    if yaml_match:
+        yaml_content = yaml_match.group(1)
+        print(yaml_content)
+    else:
+        print("No YAML code block found.")
+
+    code = f'''
+    {yaml_content}
+    '''
+    st.code(code, language='python')
+
 def main():
     st.sidebar.title("Navigation")
-    pages = ["Add env", "Manage envs"]
+    pages = ["Add env", "Manage envs", "Workflow AI Generator"]
     choice = st.sidebar.radio("Go to", pages)
 
     if choice == "Add env":
         page_add()
     elif choice == "Manage envs":
         page_manage()
+    elif choice == "Workflow AI Generator":
+        page_ai_gen()
 
 if __name__ == "__main__":
     main()

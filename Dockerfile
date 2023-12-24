@@ -3,4 +3,5 @@ WORKDIR /app
 COPY requierments.txt /app
 RUN pip install -r requierments.txt
 COPY ./app /app
-ENTRYPOINT sh -c "streamlit run main.py"
+ENTRYPOINT sh -c "streamlit run main.py" 
+#test
